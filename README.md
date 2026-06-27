@@ -18,4 +18,3 @@ Run a static server from `outputs` and open:
 ```text
 http://127.0.0.1:4173/telegram-suite.html?v=nova3
 ```
-

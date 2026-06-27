@@ -1,0 +1,1864 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nova</title>
+  <style>
+    :root {
+      --bg: #eef3f7;
+      --panel: #ffffff;
+      --panel-2: #f7fafc;
+      --ink: #14202e;
+      --muted: #6f7d8c;
+      --line: #dde5ec;
+      --brand: #239bd8;
+      --brand-2: #29a875;
+      --accent: #ef7b45;
+      --bubble: #e7f5e9;
+      --danger: #d84f5f;
+      --shadow: 0 16px 40px rgba(28, 45, 66, .14);
+    }
+
+    [data-theme="dark"] {
+      --bg: #111820;
+      --panel: #1b2530;
+      --panel-2: #222e3b;
+      --ink: #edf4f8;
+      --muted: #a4b0bc;
+      --line: #314151;
+      --bubble: #244232;
+      --shadow: 0 18px 42px rgba(0, 0, 0, .36);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(135deg, rgba(35, 155, 216, .12), transparent 38%),
+        radial-gradient(circle at 90% 12%, rgba(41, 168, 117, .13), transparent 30%),
+        var(--bg);
+      color: var(--ink);
+      font-family: Tahoma, "Segoe UI", Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    button, input, textarea { font: inherit; }
+
+    button {
+      border: 0;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 86px minmax(280px, 360px) minmax(0, 1fr) 320px;
+      height: 100vh;
+      min-height: 620px;
+      padding: 14px;
+      gap: 12px;
+    }
+
+    .rail, .sidebar, .chat, .details {
+      background: color-mix(in srgb, var(--panel) 94%, transparent);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .rail {
+      border-radius: 8px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      align-items: center;
+      padding: 12px 8px;
+    }
+
+    .mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      margin: 0 auto 16px;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+    }
+
+    .nav, .rail-bottom {
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      position: relative;
+    }
+
+    .icon-btn:hover, .icon-btn.active {
+      background: var(--panel-2);
+      color: var(--brand);
+    }
+
+    .badge {
+      position: absolute;
+      top: 4px;
+      left: 3px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 9px;
+      color: white;
+      background: var(--danger);
+      font-size: 11px;
+      display: grid;
+      place-items: center;
+    }
+
+    .sidebar, .details, .chat { border-radius: 8px; }
+
+    .topbar {
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      gap: 12px;
+      background: var(--panel);
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 21px; }
+    h2 { font-size: 18px; }
+    h3 { font-size: 15px; }
+
+    .search {
+      height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+    }
+
+    .search input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      color: var(--ink);
+      background: transparent;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .tab {
+      min-height: 34px;
+      border-radius: 8px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tab.active {
+      background: color-mix(in srgb, var(--brand) 16%, var(--panel));
+      color: var(--brand);
+      font-weight: 700;
+    }
+
+    .chat-list {
+      height: calc(100vh - 174px);
+      overflow: auto;
+      padding: 8px;
+    }
+
+    .chat-item {
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      gap: 10px;
+      width: 100%;
+      min-height: 68px;
+      border-radius: 8px;
+      align-items: center;
+      padding: 10px;
+      text-align: right;
+    }
+
+    .chat-item:hover, .chat-item.active { background: var(--panel-2); }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--c1), var(--c2));
+      box-shadow: inset 0 -16px 26px rgba(0,0,0,.16);
+      overflow: hidden;
+    }
+
+    .avatar.large { width: 78px; height: 78px; font-size: 28px; }
+
+    .item-main { min-width: 0; }
+    .meta-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .name { font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .time { color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .preview { margin-top: 5px; color: var(--muted); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .count {
+      min-width: 24px;
+      height: 24px;
+      border-radius: 12px;
+      background: var(--brand-2);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .chat {
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      min-width: 0;
+    }
+
+    .chat-head {
+      min-height: 76px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+    }
+
+    .head-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .status {
+      color: var(--brand-2);
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .head-actions {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .conversation-tools {
+      display: grid;
+      gap: 8px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--panel) 88%, var(--panel-2));
+    }
+
+    .pinned-bar {
+      min-height: 40px;
+      border-radius: 8px;
+      display: none;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      color: var(--muted);
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    .pinned-bar.show { display: grid; }
+
+    .chat-search {
+      display: none;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .chat-search.open { display: grid; }
+
+    .chat-search input {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-2);
+      color: var(--ink);
+      outline: 0;
+      padding: 0 12px;
+    }
+
+    .messages {
+      overflow: auto;
+      padding: 18px;
+      background:
+        linear-gradient(90deg, rgba(35,155,216,.06) 1px, transparent 1px),
+        linear-gradient(rgba(41,168,117,.05) 1px, transparent 1px),
+        color-mix(in srgb, var(--panel-2) 72%, var(--bg));
+      background-size: 28px 28px;
+    }
+
+    .day {
+      width: max-content;
+      margin: 0 auto 16px;
+      padding: 7px 12px;
+      border-radius: 8px;
+      color: var(--muted);
+      background: color-mix(in srgb, var(--panel) 86%, transparent);
+      font-size: 12px;
+      border: 1px solid var(--line);
+    }
+
+    .message {
+      max-width: min(72%, 620px);
+      margin: 8px 0;
+      padding: 10px 12px 8px;
+      border-radius: 8px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: 0 6px 14px rgba(20, 32, 46, .06);
+      line-height: 1.55;
+      position: relative;
+    }
+
+    .message.me {
+      margin-right: auto;
+      background: var(--bubble);
+      border-color: color-mix(in srgb, var(--brand-2) 22%, var(--line));
+    }
+
+    .message.highlight {
+      outline: 2px solid color-mix(in srgb, var(--accent) 72%, transparent);
+    }
+
+    .message .msg-meta {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    .reaction-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 8px;
+    }
+
+    .reaction {
+      min-height: 26px;
+      min-width: 34px;
+      border-radius: 13px;
+      padding: 0 8px;
+      border: 1px solid var(--line);
+      background: color-mix(in srgb, var(--panel) 78%, transparent);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .reaction.active {
+      color: var(--brand);
+      border-color: color-mix(in srgb, var(--brand) 38%, var(--line));
+      background: color-mix(in srgb, var(--brand) 10%, var(--panel));
+    }
+
+    .media-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .photo {
+      min-height: 92px;
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.22), transparent),
+        linear-gradient(135deg, var(--p1), var(--p2));
+      position: relative;
+      overflow: hidden;
+    }
+
+    .photo:after {
+      content: "";
+      position: absolute;
+      inset: auto 10px 10px auto;
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.28);
+    }
+
+    .file-card, .voice-card, .poll {
+      margin-top: 8px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: color-mix(in srgb, var(--panel) 70%, transparent);
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .voice-card {
+      grid-template-columns: 38px 1fr auto;
+      align-items: center;
+    }
+
+    .wave {
+      height: 24px;
+      background: repeating-linear-gradient(90deg, var(--brand) 0 4px, transparent 4px 10px);
+      clip-path: polygon(0 60%, 6% 30%, 13% 70%, 22% 20%, 32% 75%, 42% 35%, 50% 65%, 61% 25%, 70% 70%, 81% 40%, 91% 72%, 100% 48%, 100% 100%, 0 100%);
+      opacity: .55;
+    }
+
+    .poll-option {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .bar {
+      grid-column: 1 / -1;
+      height: 7px;
+      border-radius: 4px;
+      background: var(--line);
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      background: var(--brand);
+      width: var(--w);
+    }
+
+    .composer {
+      background: var(--panel);
+      border-top: 1px solid var(--line);
+      padding: 10px 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .quick-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      min-height: 32px;
+      border-radius: 8px;
+      padding: 0 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 13px;
+      border: 1px solid var(--line);
+    }
+
+    .chip.active {
+      color: var(--brand);
+      border-color: color-mix(in srgb, var(--brand) 34%, var(--line));
+      background: color-mix(in srgb, var(--brand) 10%, var(--panel));
+    }
+
+    .compose-row {
+      display: grid;
+      grid-template-columns: 44px 44px 1fr 48px;
+      gap: 8px;
+      align-items: end;
+    }
+
+    textarea {
+      min-height: 44px;
+      max-height: 120px;
+      resize: none;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      outline: 0;
+      background: var(--panel-2);
+      color: var(--ink);
+      padding: 10px 12px;
+    }
+
+    .send {
+      width: 48px;
+      height: 44px;
+      border-radius: 8px;
+      color: white;
+      background: var(--brand);
+      font-weight: 800;
+    }
+
+    .details {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      background: var(--panel);
+    }
+
+    .profile {
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+      text-align: center;
+      display: grid;
+      gap: 10px;
+      justify-items: center;
+    }
+
+    .profile-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      width: 100%;
+    }
+
+    .details-body {
+      overflow: auto;
+      padding: 14px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .section {
+      display: grid;
+      gap: 9px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .info-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .info-row {
+      min-height: 42px;
+      border-radius: 8px;
+      background: var(--panel-2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 11px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .gallery .photo { min-height: 76px; }
+
+    .settings-pane {
+      position: fixed;
+      inset: 14px 112px 14px auto;
+      width: min(420px, calc(100vw - 28px));
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      z-index: 5;
+      transform: translateX(calc(100% + 140px));
+      transition: transform .25s ease;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .settings-pane.open { transform: translateX(0); }
+
+    .settings-list {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+      overflow: auto;
+    }
+
+    .toggle {
+      width: 48px;
+      height: 26px;
+      border-radius: 14px;
+      background: var(--line);
+      padding: 3px;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .toggle span {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+    }
+
+    .toggle.on {
+      background: var(--brand-2);
+      justify-content: flex-end;
+    }
+
+    .empty {
+      color: var(--muted);
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 8;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(11, 18, 28, .42);
+      backdrop-filter: blur(6px);
+    }
+
+    .modal-backdrop.open { display: grid; }
+
+    .modal {
+      width: min(560px, 100%);
+      max-height: min(760px, calc(100vh - 36px));
+      overflow: auto;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .modal-head {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .modal-body {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .field input, .field textarea, .field select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      outline: 0;
+      background: var(--panel-2);
+      color: var(--ink);
+      padding: 10px 12px;
+    }
+
+    .field textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .segment {
+      min-height: 58px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      color: var(--muted);
+      display: grid;
+      place-items: center;
+      gap: 3px;
+    }
+
+    .segment strong { color: var(--ink); }
+
+    .segment.active {
+      border-color: color-mix(in srgb, var(--brand) 48%, var(--line));
+      background: color-mix(in srgb, var(--brand) 12%, var(--panel));
+      color: var(--brand);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-start;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn, .ghost-btn {
+      min-height: 40px;
+      border-radius: 8px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      font-weight: 700;
+    }
+
+    .primary-btn {
+      color: white;
+      border-color: var(--brand);
+      background: var(--brand);
+    }
+
+    .ghost-btn {
+      color: var(--muted);
+      background: var(--panel-2);
+    }
+
+    .creator-preview {
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+    }
+
+    .profile-mini {
+      display: grid;
+      grid-template-columns: 68px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .feature-panel {
+      display: grid;
+      gap: 10px;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .mini-card {
+      min-height: 72px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      padding: 10px;
+      display: grid;
+      gap: 5px;
+      align-content: center;
+    }
+
+    .mini-card strong { color: var(--ink); }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--brand-2);
+      display: inline-block;
+      margin-inline-start: 6px;
+    }
+
+    @media (max-width: 1180px) {
+      .app { grid-template-columns: 76px 320px minmax(0, 1fr); }
+      .details { display: none; }
+    }
+
+    @media (max-width: 840px) {
+      body { overflow: auto; }
+      .app {
+        height: auto;
+        min-height: 100vh;
+        grid-template-columns: 1fr;
+        padding: 8px;
+      }
+      .rail {
+        min-height: 66px;
+        grid-template-columns: auto 1fr auto;
+        grid-template-rows: 1fr;
+      }
+      .mark { margin: 0; }
+      .nav, .rail-bottom { display: flex; justify-content: center; }
+      .sidebar { min-height: 360px; }
+      .chat-list { height: 270px; }
+      .chat { min-height: 640px; }
+      .message { max-width: 90%; }
+      .settings-pane { inset: 8px; width: auto; transform: translateY(calc(100% + 20px)); }
+      .settings-pane.open { transform: translateY(0); }
+      .segmented { grid-template-columns: 1fr; }
+      .mini-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" data-theme="light">
+    <aside class="rail" aria-label="التنقل الرئيسي">
+      <div class="mark" title="Nova">N</div>
+      <nav class="nav">
+        <button class="icon-btn active" title="الدردشات" data-view="chats">✉<span class="badge">8</span></button>
+        <button class="icon-btn" title="المكالمات" data-view="calls">☎</button>
+        <button class="icon-btn" title="القصص" data-view="stories">◉</button>
+        <button class="icon-btn" title="الفيديو القصير" data-view="clips">▶</button>
+        <button class="icon-btn" title="المجتمعات" data-view="communities">◇</button>
+        <button class="icon-btn" title="Nova AI" data-view="ai">✦</button>
+        <button class="icon-btn" title="المحفوظات" data-view="saved">★</button>
+        <button class="icon-btn" title="Nova Stars" data-view="wallet">✶</button>
+        <button class="icon-btn" title="البوتات" data-view="bots">⌘</button>
+      </nav>
+      <div class="rail-bottom">
+        <button class="icon-btn" title="قفل التطبيق" aria-label="قفل التطبيق" id="lockBtn">□</button>
+        <button class="icon-btn" title="الإعدادات" id="settingsBtn">⚙</button>
+      </div>
+    </aside>
+
+    <section class="sidebar" aria-label="قائمة الدردشات">
+      <div class="topbar">
+        <div class="title-row">
+          <h1>Nova</h1>
+          <button class="icon-btn" title="محادثة جديدة" id="newChatBtn">＋</button>
+        </div>
+        <label class="search" aria-label="بحث">
+          <span>⌕</span>
+          <input id="searchInput" placeholder="ابحث عن أشخاص، قنوات، ملفات" />
+        </label>
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-filter="all">الكل</button>
+          <button class="tab" data-filter="private">خاص</button>
+          <button class="tab" data-filter="group">مجموعات</button>
+          <button class="tab" data-filter="channel">قنوات</button>
+        </div>
+      </div>
+      <div class="chat-list" id="chatList"></div>
+    </section>
+
+    <section class="chat" aria-label="المحادثة">
+      <header class="chat-head">
+        <div class="head-user">
+          <div class="avatar" id="headAvatar" style="--c1:#239bd8;--c2:#29a875">م</div>
+          <div class="item-main">
+            <h2 id="headName">مريم</h2>
+            <p class="status" id="headStatus">متصلة الآن</p>
+          </div>
+        </div>
+        <div class="head-actions">
+          <button class="icon-btn" title="بحث داخل المحادثة" aria-label="بحث داخل المحادثة" id="messageSearchBtn">⌕</button>
+          <button class="icon-btn" title="تثبيت آخر رسالة" aria-label="تثبيت آخر رسالة" id="pinLastBtn">⌂</button>
+          <button class="icon-btn" title="رسائل ذاتية الحذف" aria-label="رسائل ذاتية الحذف" id="selfDestructBtn">⌛</button>
+          <button class="icon-btn" title="مكالمة صوتية" aria-label="مكالمة صوتية">☎</button>
+          <button class="icon-btn" title="مكالمة فيديو" aria-label="مكالمة فيديو">▣</button>
+        </div>
+      </header>
+
+      <div class="conversation-tools">
+        <div class="pinned-bar" id="pinnedBar">
+          <strong>مثبت</strong>
+          <span id="pinnedText"></span>
+          <button class="chip" id="clearPinnedBtn">إزالة</button>
+        </div>
+        <div class="chat-search" id="chatSearch">
+          <input id="messageSearchInput" placeholder="بحث داخل هذه المحادثة" />
+          <button class="chip" id="clearMessageSearch">مسح</button>
+        </div>
+      </div>
+
+      <div class="messages" id="messages"></div>
+
+      <footer class="composer">
+        <div class="quick-tools" id="quickTools">
+          <button class="chip" data-insert="📎 ملف مرفق">ملف</button>
+          <button class="chip" data-insert="🖼 صورة">صورة</button>
+          <button class="chip" data-insert="🎙 رسالة صوتية">صوت</button>
+          <button class="chip" data-insert="📊 تصويت">تصويت</button>
+          <button class="chip" data-insert="⏱ رسالة مجدولة">جدولة</button>
+          <button class="chip" data-insert="🔒 محادثة سرية">سري</button>
+          <button class="chip" data-action="schedule">إرسال لاحق</button>
+          <button class="chip" data-action="location">موقع مباشر</button>
+          <button class="chip" data-action="contact">جهة اتصال</button>
+          <button class="chip" data-action="live">بث مباشر</button>
+        </div>
+        <div class="compose-row">
+          <button class="icon-btn" title="ملصقات" aria-label="ملصقات">☻</button>
+          <button class="icon-btn" title="مرفقات" aria-label="مرفقات">＋</button>
+          <textarea id="composer" placeholder="اكتب رسالة"></textarea>
+          <button class="send" title="إرسال" aria-label="إرسال" id="sendBtn">➤</button>
+        </div>
+      </footer>
+    </section>
+
+    <aside class="details" aria-label="تفاصيل المحادثة">
+      <div class="profile">
+        <div class="avatar large" id="profileAvatar" style="--c1:#239bd8;--c2:#29a875">م</div>
+        <div>
+          <h2 id="profileName">مريم</h2>
+          <p class="preview" id="profileKind">حساب خاص</p>
+        </div>
+        <div class="profile-actions">
+          <button class="chip">كتم</button>
+          <button class="chip">تثبيت</button>
+          <button class="chip">أرشفة</button>
+        </div>
+      </div>
+      <div class="details-body">
+        <section class="section">
+          <div class="section-head"><span>الميزات</span><span id="featureCount">12</span></div>
+          <div class="info-list" id="featureList"></div>
+        </section>
+        <section class="section">
+          <div class="section-head"><span>الوسائط المشتركة</span><span>24</span></div>
+          <div class="gallery">
+            <div class="photo" style="--p1:#f7b267;--p2:#2a9d8f"></div>
+            <div class="photo" style="--p1:#6a8dff;--p2:#f28482"></div>
+            <div class="photo" style="--p1:#8ac926;--p2:#1982c4"></div>
+            <div class="photo" style="--p1:#ffca3a;--p2:#ff595e"></div>
+            <div class="photo" style="--p1:#00b4d8;--p2:#90be6d"></div>
+            <div class="photo" style="--p1:#9b5de5;--p2:#00bbf9"></div>
+          </div>
+        </section>
+        <section class="section">
+          <div class="section-head"><span>إحصاءات القناة</span><span>اليوم</span></div>
+          <div class="info-list">
+            <div class="info-row"><span>مشاهدات المنشورات</span><strong>18.4K</strong></div>
+            <div class="info-row"><span>التفاعل</span><strong>12%</strong></div>
+            <div class="info-row"><span>مشتركون جدد</span><strong>347</strong></div>
+          </div>
+        </section>
+      </div>
+    </aside>
+  </main>
+
+  <section class="settings-pane" id="settingsPane" aria-label="الإعدادات">
+    <div class="topbar">
+      <div class="title-row">
+        <h2>الإعدادات</h2>
+        <button class="icon-btn" title="إغلاق" id="closeSettings">×</button>
+      </div>
+    </div>
+    <div class="settings-list">
+      <div class="info-row"><span>الملف الشخصي</span><button class="chip" id="editProfileBtn">تعديل</button></div>
+      <div class="info-row"><span>الوضع الليلي</span><button class="toggle" id="themeToggle" aria-label="الوضع الليلي"><span></span></button></div>
+      <div class="info-row"><span>التحقق بخطوتين</span><button class="toggle on"><span></span></button></div>
+      <div class="info-row"><span>تنزيل الوسائط تلقائيًا</span><button class="toggle on"><span></span></button></div>
+      <div class="info-row"><span>مزامنة جهات الاتصال</span><button class="toggle"><span></span></button></div>
+      <div class="info-row"><span>طرق الدخول والحساب الضيف</span><button class="chip" id="identityBtn">عرض</button></div>
+      <div class="info-row"><span>الحسابات المتعددة</span><button class="chip" id="accountsBtn">إدارة</button></div>
+      <div class="info-row"><span>Nova AI</span><button class="chip" id="aiBtn">فتح</button></div>
+      <div class="info-row"><span>Nova Stars</span><button class="chip" id="starsBtn">المحفظة</button></div>
+      <div class="info-row"><span>Nova Premium</span><button class="chip" id="premiumBtn">ترقية</button></div>
+      <div class="info-row"><span>الخزنة الخاصة</span><button class="chip" id="vaultBtn">فتح</button></div>
+      <div class="info-row"><span>لوحة الإدارة</span><button class="chip" id="adminBtn">دخول</button></div>
+      <div class="info-row"><span>الأجهزة والجلسات</span><button class="chip" id="devicesBtn">عرض</button></div>
+      <div class="info-row"><span>مجلدات الدردشة</span><button class="chip" id="foldersBtn">إدارة</button></div>
+      <div class="info-row"><span>الرسائل المجدولة</span><button class="chip" id="scheduledBtn">عرض</button></div>
+      <div class="info-row"><span>الملصقات والرموز</span><button class="chip" id="stickersBtn">تخصيص</button></div>
+      <div class="info-row"><span>المحادثات السرية</span><strong>مفعلة</strong></div>
+      <div class="info-row"><span>الأجهزة النشطة</span><strong>3</strong></div>
+      <div class="info-row"><span>مساحة التخزين</span><strong>1.8 GB</strong></div>
+      <div class="info-row"><span>مجلدات الدردشة</span><strong>5</strong></div>
+      <div class="info-row"><span>اسم المستخدم</span><strong id="settingsUsername">@akram_demo</strong></div>
+    </div>
+  </section>
+
+  <section class="modal-backdrop" id="createModal" aria-label="إنشاء جديد">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h2 id="createTitle">إنشاء جديد</h2>
+        <button class="icon-btn" title="إغلاق" aria-label="إغلاق الإنشاء" data-close-modal="createModal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="segmented" id="createType">
+          <button class="segment active" data-type="private"><strong>محادثة</strong><span>شخص أو محفوظات</span></button>
+          <button class="segment" data-type="group"><strong>مجموعة</strong><span>أعضاء وصلاحيات</span></button>
+          <button class="segment" data-type="channel"><strong>قناة</strong><span>منشورات ومشتركين</span></button>
+        </div>
+
+        <div class="creator-preview">
+          <div class="avatar" id="createAvatar" style="--c1:#00b4d8;--c2:#90be6d">ج</div>
+          <div>
+            <h3 id="createPreviewName">محادثة جديدة</h3>
+            <p class="preview" id="createPreviewMeta">جاهزة للإنشاء المحلي</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>الاسم</span>
+            <input id="spaceName" placeholder="مثال: قناة الأخبار أو فريق التسويق" />
+          </label>
+          <label class="field">
+            <span>الرابط أو اسم المستخدم</span>
+            <input id="spaceHandle" placeholder="@my_channel" />
+          </label>
+          <label class="field">
+            <span>الوصف</span>
+            <textarea id="spaceAbout" placeholder="اكتب وصفًا قصيرًا يظهر في تفاصيل القناة أو المجموعة"></textarea>
+          </label>
+          <label class="field">
+            <span>الخصوصية</span>
+            <select id="spacePrivacy">
+              <option value="عام">عام</option>
+              <option value="خاص">خاص</option>
+              <option value="بدعوة فقط">بدعوة فقط</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>عدد الأعضاء أو المشتركين المبدئي</span>
+            <input id="spaceMembers" type="number" min="1" max="1000000" value="12" />
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button class="primary-btn" id="createSpaceBtn">إنشاء</button>
+          <button class="ghost-btn" data-close-modal="createModal">إلغاء</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="modal-backdrop" id="profileModal" aria-label="تعديل الملف الشخصي">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h2>الملف الشخصي</h2>
+        <button class="icon-btn" title="إغلاق" aria-label="إغلاق الملف الشخصي" data-close-modal="profileModal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="profile-mini">
+          <div class="avatar large" id="myProfileAvatar" style="--c1:#239bd8;--c2:#29a875">أ</div>
+          <div>
+            <h3 id="myProfileName">أكرم</h3>
+            <p class="preview" id="myProfileHandle">@akram_demo</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>الاسم الظاهر</span>
+            <input id="profileDisplayName" placeholder="اسمك" />
+          </label>
+          <label class="field">
+            <span>اسم المستخدم</span>
+            <input id="profileUsername" placeholder="@username" />
+          </label>
+          <label class="field">
+            <span>النبذة</span>
+            <textarea id="profileBio" placeholder="نبذة قصيرة تظهر للآخرين"></textarea>
+          </label>
+          <label class="field">
+            <span>رقم الهاتف</span>
+            <input id="profilePhone" placeholder="+966 5X XXX XXXX" />
+          </label>
+          <label class="field">
+            <span>ظهور آخر مشاهدة</span>
+            <select id="profilePrivacy">
+              <option value="الجميع">الجميع</option>
+              <option value="جهات الاتصال">جهات الاتصال</option>
+              <option value="لا أحد">لا أحد</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button class="primary-btn" id="saveProfileBtn">حفظ الملف</button>
+          <button class="ghost-btn" data-close-modal="profileModal">إلغاء</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="modal-backdrop" id="featureModal" aria-label="ميزات متقدمة">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h2 id="featureModalTitle">ميزات متقدمة</h2>
+        <button class="icon-btn" title="إغلاق" aria-label="إغلاق الميزات" data-close-modal="featureModal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="feature-panel" id="featureModalBody"></div>
+        <div class="modal-actions">
+          <button class="primary-btn" id="featureModalAction">تفعيل</button>
+          <button class="ghost-btn" data-close-modal="featureModal">إغلاق</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const chats = [
+      {
+        id: 1, name: "مريم النور", type: "private", status: "متصلة الآن", initials: "م", colors: ["#239bd8", "#29a875"],
+        time: "17:42", unread: 2, preview: "أرسلت لك تصميم الواجهة النهائي.",
+        messages: [
+          { from: "them", text: "صباح الخير. أرسلت لك تصميم الواجهة النهائي.", time: "17:35" },
+          { from: "me", text: "وصلني. سأراجعه الآن وأرسل الملاحظات.", time: "17:38", seen: true },
+          { from: "them", text: "ممتاز. أضفت حالات القراءة والبحث داخل المحادثة.", time: "17:42", media: true }
+        ]
+      },
+      {
+        id: 2, name: "فريق المنتج", type: "group", status: "18 عضوًا، 6 متصلون", initials: "ف", colors: ["#ef7b45", "#6a8dff"],
+        time: "17:20", unread: 5, preview: "سارة: التصويت جاهز للاجتماع.",
+        messages: [
+          { from: "them", text: "سارة: التصويت جاهز للاجتماع.", time: "17:12", poll: true },
+          { from: "me", text: "اختياري: نثبت القرار بعد نهاية التصويت.", time: "17:16", seen: true },
+          { from: "them", text: "عمر: أضفت ملف المواصفات.", time: "17:20", file: true }
+        ]
+      },
+      {
+        id: 3, name: "قناة أخبار التقنية", type: "channel", status: "128K مشترك", initials: "ت", colors: ["#2a9d8f", "#ffca3a"],
+        time: "16:58", unread: 1, preview: "ملخص تحديثات الذكاء الاصطناعي لهذا اليوم.",
+        messages: [
+          { from: "them", text: "ملخص تحديثات الذكاء الاصطناعي لهذا اليوم: نماذج أسرع، أدوات كتابة أفضل، ولوحات مراقبة أكثر ذكاء.", time: "16:58", channel: true },
+          { from: "them", text: "اضغط على زر الإحصاءات في الجانب لمتابعة أداء المنشورات.", time: "16:59" }
+        ]
+      },
+      {
+        id: 4, name: "المحفوظات", type: "private", status: "رسائلك الشخصية", initials: "ح", colors: ["#6c757d", "#20c997"],
+        time: "15:44", unread: 0, preview: "رابط، صورة، وملاحظة صوتية.",
+        messages: [
+          { from: "me", text: "ملاحظة: جهز قائمة الميزات قبل العرض.", time: "15:40", seen: true },
+          { from: "me", text: "حفظت هنا ملف الخطة.", time: "15:44", file: true, seen: true }
+        ]
+      },
+      {
+        id: 5, name: "دعم العملاء", type: "group", status: "42 عضوًا", initials: "د", colors: ["#ff595e", "#1982c4"],
+        time: "14:10", unread: 0, preview: "تم إغلاق 23 تذكرة اليوم.",
+        messages: [
+          { from: "them", text: "تم إغلاق 23 تذكرة اليوم، وبقيت 4 تذاكر تحتاج تصعيدًا.", time: "14:10", voice: true },
+          { from: "me", text: "ثبتوا المحادثات العاجلة وأرسلوا تقرير نهاية اليوم.", time: "14:15", seen: true }
+        ]
+      },
+      {
+        id: 6, name: "BotFlow", type: "channel", status: "بوت أتمتة", initials: "B", colors: ["#9b5de5", "#00bbf9"],
+        time: "12:05", unread: 0, preview: "اكتمل تشغيل مهمة النسخ الاحتياطي.",
+        messages: [
+          { from: "them", text: "اكتمل تشغيل مهمة النسخ الاحتياطي بنجاح.", time: "12:05", file: true },
+          { from: "me", text: "/status", time: "12:06", seen: true }
+        ]
+      }
+    ];
+
+    const featureSets = {
+      private: ["رسائل خاصة", "محادثة سرية", "مكالمات صوتية", "مكالمات فيديو", "رسائل ذاتية الحذف", "إرسال ملفات", "ملصقات", "بحث داخل المحادثة", "حظر وإبلاغ", "جلسات نشطة", "تفاعلات رسائل", "مشاركة موقع مباشر", "رسائل مجدولة", "مجلدات دردشة"],
+      group: ["مشرفون وصلاحيات", "تصويتات", "رسائل مثبتة", "مواضيع", "دعوات بروابط", "كتم جماعي", "أحداث صوتية", "مشاركة ملفات", "إحصاءات نشاط", "حماية من الرسائل المزعجة", "تفاعلات جماعية", "بث مباشر", "موافقات انضمام", "سجل إجراءات"],
+      channel: ["منشورات عامة", "إحصاءات", "تعليقات", "تفاعلات", "جدولة منشورات", "توقيع المدير", "رسائل صامتة", "روابط عامة", "أرشيف وسائط", "إعادة توجيه", "بث مباشر", "مجلد منشورات", "مسودات", "تحليلات نمو"]
+    };
+
+    const featureViews = {
+      identity: {
+        title: "الدخول والحساب الضيف",
+        action: "إنشاء ضيف 30 يوم",
+        html: `<div class="mini-grid">
+          <div class="mini-card"><strong>هاتف</strong><span class="preview">OTP + ربط جهات الاتصال</span></div>
+          <div class="mini-card"><strong>بريد إلكتروني</strong><span class="preview">رابط تحقق آمن</span></div>
+          <div class="mini-card"><strong>Google / Apple</strong><span class="preview">OAuth جاهز للعقود</span></div>
+          <div class="mini-card"><strong>ضيف</strong><span class="preview">30 يوم + 15 يوم مهلة ربط</span></div>
+        </div>
+        <div class="info-row"><span>حالة الضيف التجريبية</span><strong>ينتهي بعد 30 يوم</strong></div>`
+      },
+      accounts: {
+        title: "الحسابات المتعددة",
+        action: "تبديل للحساب التجاري",
+        html: `<div class="mini-grid">
+          <div class="mini-card"><strong>شخصي</strong><span class="preview">نشط الآن</span></div>
+          <div class="mini-card"><strong>أعمال</strong><span class="preview">ردود سريعة وكتالوج</span></div>
+          <div class="mini-card"><strong>ألعاب</strong><span class="preview">مجتمعات وشارات</span></div>
+          <div class="mini-card"><strong>فوري</strong><span class="preview">تبديل بدون تسجيل خروج</span></div>
+        </div>`
+      },
+      ai: {
+        title: "Nova AI",
+        action: "تلخيص المحادثة",
+        html: `<div class="mini-grid">
+          <div class="mini-card"><strong>تلخيص</strong><span class="preview">محادثات، قنوات، مكالمات</span></div>
+          <div class="mini-card"><strong>كتابة الردود</strong><span class="preview">اقتراحات حسب السياق</span></div>
+          <div class="mini-card"><strong>ترجمة فورية</strong><span class="preview">رسائل وقنوات</span></div>
+          <div class="mini-card"><strong>صوت إلى نص</strong><span class="preview">رسائل ومكالمات</span></div>
+        </div>`
+      },
+      stars: {
+        title: "Nova Stars",
+        action: "إرسال هدية",
+        html: `<div class="mini-grid">
+          <div class="mini-card"><strong>12,450</strong><span class="preview">الرصيد الحالي</span></div>
+          <div class="mini-card"><strong>الهدايا</strong><span class="preview">دعم الأصدقاء والمنشورات</span></div>
+          <div class="mini-card"><strong>البثوث</strong><span class="preview">دعم مباشر</span></div>
+          <div class="mini-card"><strong>الزخارف</strong><span class="preview">ألوان وشارات</span></div>
+        </div>`
+      },
+      premium: {
+        title: "Nova Premium",
+        action: "تفعيل تجربة Premium",
+        html: `<div class="mini-grid">
+          <div class="mini-card"><strong>ملفات أكبر</strong><span class="preview">رفع حتى 8GB</span></div>
+          <div class="mini-card"><strong>AI متقدم</strong><span class="preview">تلخيص وبحث أعمق</span></div>
+          <div class="mini-card"><strong>هوية حصرية</strong><span class="preview">ألوان وشارات وصور متحركة</span></div>
+          <div class="mini-card"><strong>حدود أعلى</strong><span class="preview">مجتمعات وقنوات أكثر</span></div>
+        </div>`
+      },
+      vault: {
+        title: "الخزنة الخاصة",
+        action: "محاكاة فتح بالبصمة",
+        html: `<div class="mini-grid">
+          <div class="mini-card"><strong>صور</strong><span class="preview">128 عنصر مشفر</span></div>
+          <div class="mini-card"><strong>فيديو</strong><span class="preview">34 عنصر مشفر</span></div>
+          <div class="mini-card"><strong>ملفات</strong><span class="preview">19 مستند خاص</span></div>
+          <div class="mini-card"><strong>فتح آمن</strong><span class="preview">PIN أو بصمة</span></div>
+        </div>`
+      },
+      admin: {
+        title: "لوحة الإدارة",
+        action: "فتح قائمة البلاغات",
+        html: `<div class="mini-grid">
+          <div class="mini-card"><strong>2.4M</strong><span class="preview">مستخدمون نشطون</span></div>
+          <div class="mini-card"><strong>318</strong><span class="preview">بلاغات مفتوحة</span></div>
+          <div class="mini-card"><strong>94K</strong><span class="preview">معاملات Stars اليوم</span></div>
+          <div class="mini-card"><strong>18%</strong><span class="preview">نمو Premium</span></div>
+        </div>`
+      },
+      status: {
+        title: "الحالات",
+        action: "نشر حالة 24 ساعة",
+        html: `<div class="mini-grid">
+          <div class="mini-card"><strong>صورة</strong><span class="preview">تختفي بعد 24 ساعة</span></div>
+          <div class="mini-card"><strong>فيديو</strong><span class="preview">موسيقى وتفاعلات</span></div>
+          <div class="mini-card"><strong>استطلاع</strong><span class="preview">تصويت سريع</span></div>
+          <div class="mini-card"><strong>خصوصية</strong><span class="preview">قوائم مشاهدة مخصصة</span></div>
+        </div>`
+      },
+      clips: {
+        title: "الفيديو القصير",
+        action: "حفظ فيديو مقترح",
+        html: `<div class="mini-grid">
+          <div class="mini-card"><strong>For You</strong><span class="preview">خوارزمية اقتراح</span></div>
+          <div class="mini-card"><strong>إعجاب وتعليق</strong><span class="preview">تفاعل اجتماعي كامل</span></div>
+          <div class="mini-card"><strong>مشاركة</strong><span class="preview">إلى محادثة أو حالة</span></div>
+          <div class="mini-card"><strong>حفظ</strong><span class="preview">قائمة مشاهدة لاحقة</span></div>
+        </div>`
+      },
+      communities: {
+        title: "المجتمعات",
+        action: "إنشاء مجتمع تجريبي",
+        html: `<div class="mini-grid">
+          <div class="mini-card"><strong>قنوات</strong><span class="preview">إعلانات ونشرات</span></div>
+          <div class="mini-card"><strong>مجموعات</strong><span class="preview">نقاشات ومواضيع</span></div>
+          <div class="mini-card"><strong>غرف صوتية</strong><span class="preview">جلسات مباشرة</span></div>
+          <div class="mini-card"><strong>فعاليات</strong><span class="preview">تقويم وحضور</span></div>
+        </div>`
+      },
+      devices: {
+        title: "الأجهزة والجلسات",
+        action: "إنهاء الجلسات القديمة",
+        html: `<div class="mini-grid">
+          <div class="mini-card"><strong><span class="dot"></span>Windows Desktop</strong><span class="preview">نشط الآن · الرياض</span></div>
+          <div class="mini-card"><strong><span class="dot"></span>iPhone</strong><span class="preview">قبل 12 دقيقة · جدة</span></div>
+          <div class="mini-card"><strong>Web Session</strong><span class="preview">قبل يوم · المتصفح</span></div>
+          <div class="mini-card"><strong>Android Tablet</strong><span class="preview">قبل 4 أيام · مؤمّن</span></div>
+        </div>`
+      },
+      folders: {
+        title: "مجلدات الدردشة",
+        action: "إنشاء مجلد ذكي",
+        html: `<div class="mini-grid">
+          <div class="mini-card"><strong>العمل</strong><span class="preview">مجموعات، قنوات، بوتات</span></div>
+          <div class="mini-card"><strong>العائلة</strong><span class="preview">خاص ومثبت</span></div>
+          <div class="mini-card"><strong>غير مقروء</strong><span class="preview">فلتر تلقائي</span></div>
+          <div class="mini-card"><strong>القنوات</strong><span class="preview">منشورات فقط</span></div>
+        </div>`
+      },
+      scheduled: {
+        title: "الرسائل المجدولة",
+        action: "جدولة رسالة تجريبية",
+        html: `<div class="info-list" id="scheduledList"></div>`
+      },
+      stickers: {
+        title: "الملصقات والرموز",
+        action: "إضافة حزمة",
+        html: `<div class="mini-grid">
+          <div class="mini-card"><strong>حزمة العمل</strong><span class="preview">24 ملصق</span></div>
+          <div class="mini-card"><strong>ردود سريعة</strong><span class="preview">18 رمز</span></div>
+          <div class="mini-card"><strong>مفضلة</strong><span class="preview">9 عناصر</span></div>
+          <div class="mini-card"><strong>أقنعة وصور</strong><span class="preview">12 تأثير</span></div>
+        </div>`
+      }
+    };
+
+    let activeId = 1;
+    let currentFilter = "all";
+    const app = document.querySelector(".app");
+    const chatList = document.getElementById("chatList");
+    const messages = document.getElementById("messages");
+    const searchInput = document.getElementById("searchInput");
+    const composer = document.getElementById("composer");
+    const createModal = document.getElementById("createModal");
+    const profileModal = document.getElementById("profileModal");
+    const createType = document.getElementById("createType");
+    const spaceName = document.getElementById("spaceName");
+    const spaceHandle = document.getElementById("spaceHandle");
+    const spaceAbout = document.getElementById("spaceAbout");
+    const spacePrivacy = document.getElementById("spacePrivacy");
+    const spaceMembers = document.getElementById("spaceMembers");
+    const chatSearch = document.getElementById("chatSearch");
+    const messageSearchInput = document.getElementById("messageSearchInput");
+    let messageSearchTerm = "";
+    let scheduledMessages = [
+      { chat: "قناة أخبار التقنية", text: "منشور موجز الساعة 9 مساء", time: "21:00" },
+      { chat: "فريق المنتج", text: "تذكير اجتماع التخطيط", time: "غدًا 10:30" }
+    ];
+    let currentFeatureView = "devices";
+    let selectedCreateType = "private";
+    let userProfile = {
+      name: "أكرم",
+      username: "@akram_demo",
+      bio: "أبني تطبيقات وتجارب دردشة سريعة.",
+      phone: "+966 50 000 0000",
+      privacy: "جهات الاتصال",
+      initials: "أ"
+    };
+
+    function activeChat() {
+      return chats.find(chat => chat.id === activeId) || chats[0];
+    }
+
+    function initialsFromName(name) {
+      return (name.trim().replace(/^[@#]+/, "").charAt(0) || "ج").toUpperCase();
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function messageHtml(text) {
+      const safe = escapeHtml(text);
+      const term = messageSearchTerm.trim();
+      if (!term) return safe;
+      const index = safe.toLowerCase().indexOf(escapeHtml(term).toLowerCase());
+      if (index === -1) return safe;
+      return `${safe.slice(0, index)}<mark>${safe.slice(index, index + term.length)}</mark>${safe.slice(index + term.length)}`;
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add("open");
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("open");
+    }
+
+    function setCreateType(type) {
+      selectedCreateType = type;
+      createType.querySelectorAll(".segment").forEach(button => {
+        button.classList.toggle("active", button.dataset.type === type);
+      });
+      const labels = {
+        private: ["إنشاء محادثة", "محادثة جديدة", "جاهزة للإنشاء المحلي", "محادثة جديدة"],
+        group: ["إنشاء مجموعة", "مجموعة جديدة", "أعضاء، مشرفون، وصلاحيات", "فريق جديد"],
+        channel: ["إنشاء قناة", "قناة جديدة", "منشورات، مشتركين، وإحصاءات", "قناة جديدة"]
+      };
+      const [title, previewName, meta, placeholder] = labels[type];
+      document.getElementById("createTitle").textContent = title;
+      document.getElementById("createPreviewName").textContent = spaceName.value.trim() || previewName;
+      document.getElementById("createPreviewMeta").textContent = meta;
+      spaceName.placeholder = placeholder;
+      if (!spaceHandle.value.trim()) spaceHandle.value = type === "channel" ? "@new_channel" : type === "group" ? "@new_group" : "@new_chat";
+      updateCreatePreview();
+    }
+
+    function updateCreatePreview() {
+      const name = spaceName.value.trim();
+      const fallback = selectedCreateType === "channel" ? "قناة جديدة" : selectedCreateType === "group" ? "مجموعة جديدة" : "محادثة جديدة";
+      const finalName = name || fallback;
+      const avatar = document.getElementById("createAvatar");
+      avatar.textContent = initialsFromName(finalName);
+      document.getElementById("createPreviewName").textContent = finalName;
+      document.getElementById("createPreviewMeta").textContent = `${spacePrivacy.value} · ${spaceMembers.value || 1} ${selectedCreateType === "channel" ? "مشترك" : "عضو"}`;
+    }
+
+    function openCreateModal(type = "private") {
+      spaceName.value = "";
+      spaceHandle.value = "";
+      spaceAbout.value = "";
+      spaceMembers.value = type === "channel" ? 120 : type === "group" ? 12 : 1;
+      spacePrivacy.value = type === "private" ? "خاص" : "عام";
+      setCreateType(type);
+      openModal("createModal");
+      spaceName.focus();
+    }
+
+    function createSpace() {
+      const id = Math.max(...chats.map(chat => chat.id)) + 1;
+      const fallback = selectedCreateType === "channel" ? "قناة جديدة" : selectedCreateType === "group" ? "مجموعة جديدة" : "محادثة جديدة";
+      const name = spaceName.value.trim() || fallback;
+      const handle = spaceHandle.value.trim() || `@space_${id}`;
+      const about = spaceAbout.value.trim() || "تم إنشاؤها من داخل Nova.";
+      const members = Number(spaceMembers.value) || 1;
+      const now = new Date().toLocaleTimeString("ar-SA", { hour: "2-digit", minute: "2-digit" });
+      const typeLabel = selectedCreateType === "channel" ? `${members} مشترك · ${spacePrivacy.value}` : selectedCreateType === "group" ? `${members} عضو · ${spacePrivacy.value}` : "حساب خاص";
+      const intro = selectedCreateType === "channel"
+        ? `تم إنشاء القناة ${name}. يمكنك الآن نشر الرسائل وجدولتها ومتابعة الإحصاءات.`
+        : selectedCreateType === "group"
+          ? `تم إنشاء المجموعة ${name}. أضف الأعضاء وحدد صلاحيات المشرفين.`
+          : `تم إنشاء المحادثة ${name}.`;
+      chats.unshift({
+        id,
+        name,
+        type: selectedCreateType,
+        status: typeLabel,
+        initials: initialsFromName(name),
+        colors: selectedCreateType === "channel" ? ["#2a9d8f", "#ffca3a"] : selectedCreateType === "group" ? ["#ef7b45", "#6a8dff"] : ["#00b4d8", "#90be6d"],
+        time: now,
+        unread: 0,
+        preview: about,
+        messages: [
+          { from: "them", text: intro, time: now },
+          { from: "me", text: `${handle} · ${about}`, time: now, seen: true }
+        ]
+      });
+      activeId = id;
+      currentFilter = "all";
+      document.querySelectorAll(".tab").forEach(button => button.classList.toggle("active", button.dataset.filter === "all"));
+      searchInput.value = "";
+      closeModal("createModal");
+      renderList();
+      renderMessages();
+    }
+
+    function openProfileModal() {
+      document.getElementById("profileDisplayName").value = userProfile.name;
+      document.getElementById("profileUsername").value = userProfile.username;
+      document.getElementById("profileBio").value = userProfile.bio;
+      document.getElementById("profilePhone").value = userProfile.phone;
+      document.getElementById("profilePrivacy").value = userProfile.privacy;
+      updateProfilePreview();
+      openModal("profileModal");
+      document.getElementById("profileDisplayName").focus();
+    }
+
+    function updateProfilePreview() {
+      const name = document.getElementById("profileDisplayName").value.trim() || userProfile.name;
+      const username = document.getElementById("profileUsername").value.trim() || userProfile.username;
+      document.getElementById("myProfileName").textContent = name;
+      document.getElementById("myProfileHandle").textContent = username;
+      document.getElementById("myProfileAvatar").textContent = initialsFromName(name);
+    }
+
+    function saveProfile() {
+      const name = document.getElementById("profileDisplayName").value.trim() || "أكرم";
+      const username = document.getElementById("profileUsername").value.trim() || "@akram_demo";
+      userProfile = {
+        name,
+        username,
+        bio: document.getElementById("profileBio").value.trim() || "لا توجد نبذة بعد.",
+        phone: document.getElementById("profilePhone").value.trim() || "",
+        privacy: document.getElementById("profilePrivacy").value,
+        initials: initialsFromName(name)
+      };
+      document.getElementById("settingsUsername").textContent = userProfile.username;
+      document.querySelector(".mark").textContent = userProfile.initials;
+      closeModal("profileModal");
+      composer.value = `تم تحديث الملف الشخصي: ${userProfile.name} ${userProfile.username}`;
+      composer.focus();
+    }
+
+    function renderList() {
+      const term = searchInput.value.trim().toLowerCase();
+      const filtered = chats.filter(chat => {
+        const matchesFilter = currentFilter === "all" || chat.type === currentFilter;
+        const matchesTerm = !term || `${chat.name} ${chat.preview} ${chat.status}`.toLowerCase().includes(term);
+        return matchesFilter && matchesTerm;
+      });
+      chatList.innerHTML = filtered.map(chat => `
+        <button class="chat-item ${chat.id === activeId ? "active" : ""}" data-chat="${chat.id}">
+          <div class="avatar" style="--c1:${chat.colors[0]};--c2:${chat.colors[1]}">${chat.initials}</div>
+          <div class="item-main">
+            <div class="meta-row"><span class="name">${chat.name}</span><span class="time">${chat.time}</span></div>
+            <div class="preview">${chat.preview}</div>
+          </div>
+          ${chat.unread ? `<span class="count">${chat.unread}</span>` : `<span class="time">✓✓</span>`}
+        </button>
+      `).join("") || `<div class="empty">لا توجد نتائج مطابقة.</div>`;
+    }
+
+    function renderMessages() {
+      const chat = activeChat();
+      document.getElementById("headName").textContent = chat.name;
+      document.getElementById("headStatus").textContent = chat.status;
+      document.getElementById("headAvatar").textContent = chat.initials;
+      document.getElementById("headAvatar").style.setProperty("--c1", chat.colors[0]);
+      document.getElementById("headAvatar").style.setProperty("--c2", chat.colors[1]);
+      document.getElementById("profileName").textContent = chat.name;
+      document.getElementById("profileKind").textContent = chat.type === "channel" ? "قناة عامة" : chat.type === "group" ? "مجموعة" : "حساب خاص";
+      document.getElementById("profileAvatar").textContent = chat.initials;
+      document.getElementById("profileAvatar").style.setProperty("--c1", chat.colors[0]);
+      document.getElementById("profileAvatar").style.setProperty("--c2", chat.colors[1]);
+      document.getElementById("pinnedText").textContent = chat.pinned || "";
+      document.getElementById("pinnedBar").classList.toggle("show", Boolean(chat.pinned));
+      renderFeatures(chat.type);
+
+      messages.innerHTML = `<div class="day">اليوم</div>` + chat.messages.map((message, index) => `
+        <article class="message ${message.from === "me" ? "me" : ""} ${messageSearchTerm && message.text.toLowerCase().includes(messageSearchTerm.toLowerCase()) ? "highlight" : ""}" data-message-index="${index}">
+          <div>${messageHtml(message.text)}</div>
+          ${message.media ? mediaTemplate() : ""}
+          ${message.file ? fileTemplate() : ""}
+          ${message.voice ? voiceTemplate() : ""}
+          ${message.poll ? pollTemplate() : ""}
+          <div class="msg-meta"><span>${message.time}</span><span>${message.seen ? "✓✓" : "✓"}</span></div>
+          ${reactionTemplate(message, index)}
+        </article>
+      `).join("");
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function reactionTemplate(message, index) {
+      const reactions = message.reactions || {};
+      return `<div class="reaction-row">
+        ${["👍", "❤️", "🔥", "👏"].map(icon => `<button class="reaction ${reactions[icon] ? "active" : ""}" data-message-index="${index}" data-reaction="${icon}">${icon} ${reactions[icon] || ""}</button>`).join("")}
+      </div>`;
+    }
+
+    function renderFeatures(type) {
+      const list = featureSets[type] || featureSets.private;
+      document.getElementById("featureCount").textContent = list.length;
+      document.getElementById("featureList").innerHTML = list.map((item, index) => `
+        <div class="info-row"><span>${item}</span><strong>${index % 3 === 0 ? "مميز" : "جاهز"}</strong></div>
+      `).join("");
+    }
+
+    function mediaTemplate() {
+      return `<div class="media-grid">
+        <div class="photo" style="--p1:#f7b267;--p2:#2a9d8f"></div>
+        <div class="photo" style="--p1:#6a8dff;--p2:#f28482"></div>
+      </div>`;
+    }
+
+    function fileTemplate() {
+      return `<div class="file-card"><strong>ملف مواصفات.pdf</strong><span class="preview">2.4 MB · تم فحصه</span></div>`;
+    }
+
+    function voiceTemplate() {
+      return `<div class="voice-card"><button class="send">▶</button><div class="wave"></div><span class="time">0:42</span></div>`;
+    }
+
+    function pollTemplate() {
+      return `<div class="poll">
+        <strong>ما أولوية الإطلاق؟</strong>
+        <div class="poll-option"><span>المحادثات أولًا</span><strong>54%</strong><div class="bar"><span style="--w:54%"></span></div></div>
+        <div class="poll-option"><span>القنوات أولًا</span><strong>31%</strong><div class="bar"><span style="--w:31%"></span></div></div>
+        <div class="poll-option"><span>المكالمات أولًا</span><strong>15%</strong><div class="bar"><span style="--w:15%"></span></div></div>
+      </div>`;
+    }
+
+    function sendMessage() {
+      const text = composer.value.trim();
+      if (!text) return;
+      const chat = activeChat();
+      const now = new Date();
+      const time = now.toLocaleTimeString("ar-SA", { hour: "2-digit", minute: "2-digit" });
+      chat.messages.push({ from: "me", text, time, seen: true });
+      chat.preview = text;
+      chat.time = time;
+      composer.value = "";
+      renderList();
+      renderMessages();
+    }
+
+    function pinLastMessage() {
+      const chat = activeChat();
+      const last = chat.messages.at(-1);
+      if (!last) return;
+      chat.pinned = last.text;
+      renderMessages();
+    }
+
+    function scheduleCurrentMessage() {
+      const text = composer.value.trim() || "رسالة مجدولة بدون نص";
+      const chat = activeChat();
+      scheduledMessages.unshift({ chat: chat.name, text, time: "بعد ساعة" });
+      composer.value = "";
+      composer.placeholder = "تمت جدولة الرسالة";
+      openFeatureModal("scheduled");
+    }
+
+    function openFeatureModal(view) {
+      currentFeatureView = view;
+      const config = featureViews[view];
+      document.getElementById("featureModalTitle").textContent = config.title;
+      document.getElementById("featureModalBody").innerHTML = config.html;
+      document.getElementById("featureModalAction").textContent = config.action;
+      if (view === "scheduled") renderScheduledList();
+      openModal("featureModal");
+    }
+
+    function renderScheduledList() {
+      const list = document.getElementById("scheduledList");
+      if (!list) return;
+      list.innerHTML = scheduledMessages.map(item => `
+        <div class="info-row"><span>${escapeHtml(item.chat)} · ${escapeHtml(item.text)}</span><strong>${escapeHtml(item.time)}</strong></div>
+      `).join("") || `<div class="empty">لا توجد رسائل مجدولة.</div>`;
+    }
+
+    function runFeatureAction() {
+      if (currentFeatureView === "scheduled") {
+        scheduledMessages.unshift({ chat: activeChat().name, text: "رسالة تجريبية من لوحة الجدولة", time: "غدًا 08:00" });
+        renderScheduledList();
+        return;
+      }
+      if (currentFeatureView === "folders") {
+        searchInput.value = activeChat().type === "channel" ? "قناة" : activeChat().type === "group" ? "فريق" : "";
+        renderList();
+      }
+      const actionMessages = {
+        identity: "تم إنشاء حساب ضيف تجريبي: صالح 30 يومًا مع تنبيه ربط الحساب.",
+        accounts: "تم التبديل إلى حساب الأعمال التجريبي.",
+        ai: "Nova AI: ملخص سريع - المحادثة نشطة وبها رسائل ووسائط وتفاعلات.",
+        stars: "تم إرسال هدية Nova Stars تجريبية.",
+        premium: "تم تفعيل Nova Premium التجريبي: ملفات أكبر وذكاء اصطناعي متقدم.",
+        vault: "تم فتح الخزنة الخاصة بمحاكاة PIN/بصمة.",
+        admin: "لوحة الإدارة: تم تحميل البلاغات والإحصائيات.",
+        status: "تم تجهيز حالة تختفي بعد 24 ساعة.",
+        clips: "تم حفظ فيديو قصير في قائمة المشاهدة لاحقًا.",
+        communities: "تم إنشاء مجتمع تجريبي يحتوي قنوات ومجموعات وغرفة صوتية.",
+        devices: "تم إنهاء الجلسات القديمة تجريبيًا.",
+        stickers: "تمت إضافة حزمة ملصقات تجريبية."
+      };
+      composer.value = actionMessages[currentFeatureView] || `تم تفعيل: ${featureViews[currentFeatureView].title}`;
+      composer.focus();
+    }
+
+    chatList.addEventListener("click", event => {
+      const item = event.target.closest("[data-chat]");
+      if (!item) return;
+      activeId = Number(item.dataset.chat);
+      activeChat().unread = 0;
+      renderList();
+      renderMessages();
+    });
+
+    document.querySelectorAll(".tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(btn => btn.classList.remove("active"));
+        tab.classList.add("active");
+        currentFilter = tab.dataset.filter;
+        renderList();
+      });
+    });
+
+    document.querySelectorAll("[data-view]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("[data-view]").forEach(item => item.classList.remove("active"));
+        btn.classList.add("active");
+        const view = btn.dataset.view;
+        if (view === "calls") composer.value = "مكالمة جديدة مع ";
+        if (view === "stories") openFeatureModal("status");
+        if (view === "clips") openFeatureModal("clips");
+        if (view === "communities") openFeatureModal("communities");
+        if (view === "ai") openFeatureModal("ai");
+        if (view === "wallet") openFeatureModal("stars");
+        if (view === "saved") activeId = 4;
+        if (view === "bots") activeId = 6;
+        renderList();
+        renderMessages();
+      });
+    });
+
+    searchInput.addEventListener("input", renderList);
+    document.getElementById("sendBtn").addEventListener("click", sendMessage);
+    composer.addEventListener("keydown", event => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    });
+
+    document.getElementById("quickTools").addEventListener("click", event => {
+      const action = event.target.closest("[data-action]");
+      if (action) {
+        const chat = activeChat();
+        if (action.dataset.action === "schedule") scheduleCurrentMessage();
+        if (action.dataset.action === "location") composer.value = "📍 أشارك موقعي المباشر لمدة 15 دقيقة";
+        if (action.dataset.action === "contact") composer.value = `👤 جهة اتصال: ${userProfile.name} ${userProfile.phone}`;
+        if (action.dataset.action === "live") composer.value = chat.type === "channel" ? "بدأ بث مباشر في القناة" : "بدأت غرفة بث مباشر";
+        composer.focus();
+        document.querySelectorAll(".chip").forEach(item => item.classList.remove("active"));
+        action.classList.add("active");
+        return;
+      }
+      const chip = event.target.closest("[data-insert]");
+      if (!chip) return;
+      composer.value = composer.value ? `${composer.value} ${chip.dataset.insert}` : chip.dataset.insert;
+      composer.focus();
+      document.querySelectorAll(".chip").forEach(item => item.classList.remove("active"));
+      chip.classList.add("active");
+    });
+
+    messages.addEventListener("click", event => {
+      const reaction = event.target.closest("[data-reaction]");
+      if (!reaction) return;
+      const chat = activeChat();
+      const message = chat.messages[Number(reaction.dataset.messageIndex)];
+      if (!message) return;
+      message.reactions = message.reactions || {};
+      const icon = reaction.dataset.reaction;
+      message.reactions[icon] = message.reactions[icon] ? 0 : 1;
+      if (!message.reactions[icon]) delete message.reactions[icon];
+      renderMessages();
+    });
+
+    document.getElementById("messageSearchBtn").addEventListener("click", () => {
+      chatSearch.classList.toggle("open");
+      if (chatSearch.classList.contains("open")) messageSearchInput.focus();
+    });
+
+    messageSearchInput.addEventListener("input", () => {
+      messageSearchTerm = messageSearchInput.value.trim();
+      renderMessages();
+    });
+
+    document.getElementById("clearMessageSearch").addEventListener("click", () => {
+      messageSearchInput.value = "";
+      messageSearchTerm = "";
+      chatSearch.classList.remove("open");
+      renderMessages();
+    });
+
+    document.getElementById("pinLastBtn").addEventListener("click", pinLastMessage);
+    document.getElementById("clearPinnedBtn").addEventListener("click", () => {
+      activeChat().pinned = "";
+      renderMessages();
+    });
+
+    document.getElementById("selfDestructBtn").addEventListener("click", event => {
+      event.currentTarget.classList.toggle("active");
+      composer.placeholder = event.currentTarget.classList.contains("active") ? "رسالة ذاتية الحذف بعد 24 ساعة" : "اكتب رسالة";
+    });
+
+    document.getElementById("newChatBtn").addEventListener("click", () => openCreateModal("private"));
+
+    createType.addEventListener("click", event => {
+      const button = event.target.closest("[data-type]");
+      if (!button) return;
+      setCreateType(button.dataset.type);
+    });
+
+    [spaceName, spacePrivacy, spaceMembers].forEach(input => {
+      input.addEventListener("input", updateCreatePreview);
+      input.addEventListener("change", updateCreatePreview);
+    });
+
+    document.getElementById("createSpaceBtn").addEventListener("click", createSpace);
+
+    document.querySelectorAll("[data-close-modal]").forEach(button => {
+      button.addEventListener("click", () => closeModal(button.dataset.closeModal));
+    });
+
+    [createModal, profileModal, document.getElementById("featureModal")].forEach(modal => {
+      modal.addEventListener("click", event => {
+        if (event.target === modal) closeModal(modal.id);
+      });
+    });
+
+    document.getElementById("editProfileBtn").addEventListener("click", openProfileModal);
+    document.getElementById("saveProfileBtn").addEventListener("click", saveProfile);
+    ["profileDisplayName", "profileUsername"].forEach(id => {
+      document.getElementById(id).addEventListener("input", updateProfilePreview);
+    });
+
+    document.getElementById("devicesBtn").addEventListener("click", () => openFeatureModal("devices"));
+    document.getElementById("identityBtn").addEventListener("click", () => openFeatureModal("identity"));
+    document.getElementById("accountsBtn").addEventListener("click", () => openFeatureModal("accounts"));
+    document.getElementById("aiBtn").addEventListener("click", () => openFeatureModal("ai"));
+    document.getElementById("starsBtn").addEventListener("click", () => openFeatureModal("stars"));
+    document.getElementById("premiumBtn").addEventListener("click", () => openFeatureModal("premium"));
+    document.getElementById("vaultBtn").addEventListener("click", () => openFeatureModal("vault"));
+    document.getElementById("adminBtn").addEventListener("click", () => openFeatureModal("admin"));
+    document.getElementById("foldersBtn").addEventListener("click", () => openFeatureModal("folders"));
+    document.getElementById("scheduledBtn").addEventListener("click", () => openFeatureModal("scheduled"));
+    document.getElementById("stickersBtn").addEventListener("click", () => openFeatureModal("stickers"));
+    document.getElementById("featureModalAction").addEventListener("click", runFeatureAction);
+
+    document.getElementById("settingsBtn").addEventListener("click", () => {
+      document.getElementById("settingsPane").classList.add("open");
+    });
+
+    document.getElementById("closeSettings").addEventListener("click", () => {
+      document.getElementById("settingsPane").classList.remove("open");
+    });
+
+    document.getElementById("themeToggle").addEventListener("click", event => {
+      event.currentTarget.classList.toggle("on");
+      app.dataset.theme = app.dataset.theme === "dark" ? "light" : "dark";
+    });
+
+    document.getElementById("lockBtn").addEventListener("click", () => {
+      composer.value = "تم قفل التطبيق محليًا. أدخل رمز PIN للمتابعة.";
+      composer.focus();
+    });
+
+    renderList();
+    renderMessages();
+  </script>
+</body>
+</html>

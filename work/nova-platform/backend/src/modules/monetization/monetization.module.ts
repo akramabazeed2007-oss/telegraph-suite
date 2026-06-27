@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { MonetizationController } from './monetization.controller';
 
-@Module({})
+@Module({
+  controllers: [MonetizationController],
+})
 export class MonetizationModule {}

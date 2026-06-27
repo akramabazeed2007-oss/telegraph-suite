@@ -1,0 +1,202 @@
+openapi: 3.1.0
+info:
+  title: Nova API
+  version: 0.1.0
+  description: Initial REST contract for the Nova NestJS backend.
+servers:
+  - url: https://api.nova.example.com
+paths:
+  /auth/guest:
+    post:
+      summary: Create a temporary guest account
+      responses:
+        "201":
+          description: Guest account and session token
+  /auth/phone/start:
+    post:
+      summary: Start phone OTP login
+      responses:
+        "202":
+          description: OTP sent
+  /auth/email/start:
+    post:
+      summary: Start email login
+      responses:
+        "202":
+          description: Verification sent
+  /auth/oauth/{provider}:
+    post:
+      summary: Login with Google or Apple
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [google, apple]
+      responses:
+        "200":
+          description: OAuth session
+  /me:
+    get:
+      summary: Get current user profile
+      responses:
+        "200":
+          description: Profile
+    patch:
+      summary: Update current user profile
+      responses:
+        "200":
+          description: Updated profile
+  /accounts:
+    get:
+      summary: List personal, business, and gaming accounts
+      responses:
+        "200":
+          description: Account list
+    post:
+      summary: Create an additional account
+      responses:
+        "201":
+          description: Account created
+  /conversations:
+    get:
+      summary: List conversations
+      responses:
+        "200":
+          description: Conversations
+    post:
+      summary: Create direct chat, group, channel, or room
+      responses:
+        "201":
+          description: Conversation created
+  /conversations/{id}/messages:
+    get:
+      summary: List messages
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Message list
+    post:
+      summary: Send or schedule a message
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "201":
+          description: Message created
+  /messages/{id}:
+    patch:
+      summary: Edit a message
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Message updated
+    delete:
+      summary: Delete a message
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "204":
+          description: Message deleted
+  /messages/{id}/reactions:
+    post:
+      summary: Add or remove emoji reaction
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Reaction toggled
+  /calls:
+    post:
+      summary: Start a voice, video, group, or screen-share call
+      responses:
+        "201":
+          description: Call created
+  /calls/{id}/summary:
+    post:
+      summary: Generate AI call summary
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Summary generated
+  /status:
+    post:
+      summary: Create 24-hour status post
+      responses:
+        "201":
+          description: Status created
+  /clips:
+    get:
+      summary: Recommended short-video feed
+      responses:
+        "200":
+          description: Clip feed
+    post:
+      summary: Upload short video
+      responses:
+        "201":
+          description: Clip created
+  /communities:
+    get:
+      summary: List communities
+      responses:
+        "200":
+          description: Communities
+    post:
+      summary: Create community
+      responses:
+        "201":
+          description: Community created
+  /ai/summarize:
+    post:
+      summary: Summarize chat, channel, call, or search result
+      responses:
+        "200":
+          description: AI summary
+  /ai/translate:
+    post:
+      summary: Translate text or message
+      responses:
+        "200":
+          description: Translation
+  /stars/wallet:
+    get:
+      summary: Get Nova Stars balance
+      responses:
+        "200":
+          description: Wallet
+  /premium/checkout:
+    post:
+      summary: Start Nova Premium checkout
+      responses:
+        "201":
+          description: Checkout session
+  /vault/items:
+    get:
+      summary: List private vault items after unlock
+      responses:
+        "200":
+          description: Vault items
+    post:
+      summary: Add encrypted item to vault
+      responses:
+        "201":
+          description: Vault item created
+  /admin/reports:
+    get:
+      summary: Admin report queue
+      responses:
+        "200":
+          description: Reports
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid

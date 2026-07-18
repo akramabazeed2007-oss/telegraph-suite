@@ -25,3 +25,15 @@ Expanded Nova prototype:
 ```text
 http://127.0.0.1:4173/nova-full-app.html
 ```
+
+## Development Status
+
+Implemented in this repository:
+
+- Expanded Nova web prototype with login, home, chats, groups, channels, calls, reels, profiles, notifications, admin, and AI surfaces.
+- NestJS backend scaffold with controllers for auth, conversations, calls, social features, communities, AI, monetization, and admin.
+- Socket.IO realtime gateway skeleton.
+- PostgreSQL baseline schema and phase 2 additions.
+- Flutter shell scaffold for Android, iOS, and Web migration.
+
+See `outputs/nova-test-plan.md` for the current manual test checklist and backend endpoint map.

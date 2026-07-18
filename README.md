@@ -26,6 +26,18 @@ Expanded Nova prototype:
 http://127.0.0.1:4173/nova-full-app.html
 ```
 
+## Deployment
+
+Static deployment root:
+
+```text
+outputs
+```
+
+GitHub Pages serves `outputs/index.html`, which redirects to `nova-full-app.html`.
+
+Netlify is configured through `netlify.toml` with `outputs` as the publish directory.
+
 ## Development Status
 
 Implemented in this repository:

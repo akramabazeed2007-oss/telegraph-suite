@@ -1,0 +1,13 @@
+[build]
+  publish = "outputs"
+  command = ""
+
+[[redirects]]
+  from = "/"
+  to = "/nova-full-app.html"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/nova-full-app.html"
+  status = 200
